@@ -76,28 +76,27 @@
             height: 30px;
         }
         
-button {
-    padding: 10px 20px;
-    font-size: 18px;
-    color: #06c212;
-    background-color: #333;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: color 0.9s ease-in-out;
-    transition: background-color 0.3s ease-in-out, border-radius 0.3s ease-in-out;;
-}
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #06c212;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: color 0.9s ease-in-out;
+            transition: background-color 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+        }
 
-button:hover {
-    border-radius: 90px; 
-}
+        button:hover {
+            border-radius: 90px; 
+        }
 
-button:active {
-    color: #ff1500; /* изменение радиуса скругления на 90 пикселей при нажатии */
-}
+        button:active {
+            color: #ff1500; /* изменение радиуса скругления на 90 пикселей при нажатии */
+        }
 
-        
         .error {
             color: red;
             font-weight: bold;
@@ -140,91 +139,91 @@ button:active {
 </head>
 <body>
     <div class="container">
-        <div class="input-container" id="key-input-container">
+        <div class="input-container" id="a">
             <div class="input-wrapper">
-                <input type="text" id="key-input" placeholder="Enter Key">
+                <input type="text" id="b" placeholder="Enter Key">
                 <img src="key.png" alt="Key Icon" class="key-icon">
             </div>
-            <button onclick="validateKey()">Submit</button>
-            <div id="message"></div>
+            <button onclick="c()">Submit</button>
+            <div id="d"></div>
         </div>
-        <div class="menu" id="menu">
-            <input type="text" id="discord-name" placeholder="Enter Discord Name">
-            <button onclick="sendDiscordName()">Submit</button>
-            <div id="confirmation"></div>
+        <div class="menu" id="e">
+            <input type="text" id="f" placeholder="Enter Discord Name">
+            <button onclick="g()">Submit</button>
+            <div id="h"></div>
             <p class="info-text">Your Discord name will be added within 24 hours by the user sssrest.</p>
         </div>
     </div>
     <script>
-        const discordWebhookUrl = "https://discord.com/api/webhooks/1267637944764727377/kOQ-mDJT430sAhf_LH1oGtR4Jaqp4uXrvVlvsGi_QIZbG4iLaPrUnY5K_ChhRty2Vn5t"; // Replace with your Discord webhook URL
-        let validKeys = JSON.parse(localStorage.getItem('validKeys')) || ["DK82jcKS-VKD83KsicD-MSjcJd87-Hjduck8kd"]; // Initial key
-        let usedKeys = JSON.parse(localStorage.getItem('usedKeys')) || [];
-        let isKeyValid = false;
+        const i = "https://discord.com/api/webhooks/1267637944764727377/kOQ-mDJT430sAhf_LH1oGtR4Jaqp4uXrvVlvsGi_QIZbG4iLaPrUnY5K_ChhRty2Vn5t"; // Replace with your Discord webhook URL
+        let j = JSON.parse(localStorage.getItem('validKeys')) || ["DK82jcKS-VKD83KsicD-MSjcJd87-Hjduck8kd"]; // Initial key
+        let k = JSON.parse(localStorage.getItem('usedKeys')) || [];
+        let l = false;
 
-        function validateKey() {
-            const keyInput = document.getElementById("key-input").value;
-            const message = document.getElementById("message");
+        function c() {
+            const m = document.getElementById("b").value;
+            const n = document.getElementById("d");
             
-            if (validKeys.includes(keyInput) && !usedKeys.includes(keyInput)) {
-                isKeyValid = true;
-                usedKeys.push(keyInput);
-                localStorage.setItem('usedKeys', JSON.stringify(usedKeys));
-                validKeys = validKeys.filter(key => key !== keyInput);
-                localStorage.setItem('validKeys', JSON.stringify(validKeys));
-                sendToWebhook(keyInput);
-                generateNewKey();
-                document.getElementById("key-input-container").classList.remove("active");
-                document.getElementById("menu").classList.add("active");
-                message.innerHTML = "";
+            if (j.includes(m) && !k.includes(m)) {
+                l = true;
+                k.push(m);
+                localStorage.setItem('usedKeys', JSON.stringify(k));
+                j = j.filter(o => o !== m);
+                localStorage.setItem('validKeys', JSON.stringify(j));
+                p(m);
+                q();
+                document.getElementById("a").classList.remove("active");
+                document.getElementById("e").classList.add("active");
+                n.innerHTML = "";
             } else {
-                message.innerHTML = "<p class='error'>Invalid or already used Key</p>";
+                n.innerHTML = "<p class='error'>Invalid or already used Key</p>";
             }
         }
 
-        function generateNewKey() {
-            const newKey = generateKeyFormat();
-            validKeys.push(newKey);
-            localStorage.setItem('validKeys', JSON.stringify(validKeys));
-            sendToWebhook(newKey, 'Old KEY : ');
+        function q() {
+            const r = s();
+            j.push(r);
+            localStorage.setItem('validKeys', JSON.stringify(j));
+            p(r, 'Old KEY : ');
         }
 
-        function generateKeyFormat() {
-            const segments = 5;
-            const segmentLength = 8;
-            let key = '';
-            for (let i = 0; i < segments; i++) {
-                if (i > 0) key += '-';
-                key += Math.random().toString(36).substr(2, segmentLength).toUpperCase();
+        function s() {
+            const t = 5;
+            const u = 8;
+            let v = '';
+            for (let w = 0; w < t; w++) {
+                if (w > 0) v += '-';
+                v += Math.random().toString(36).substr(2, u).toUpperCase();
             }
-            return key;
+            return v;
         }
 
-        function sendToWebhook(content, additionalInfo = '') {
-            fetch(discordWebhookUrl, {
+        function p(x, y = '') {
+            fetch(i, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ content: `${content} ${additionalInfo}` })
+                body: JSON.stringify({ content: `${x} ${y}` })
             })
             .then(response => response.json())
             .then(data => console.log("Success:", data))
             .catch(error => console.error("Error:", error));
         }
 
-        function sendDiscordName() {
-            const discordName = document.getElementById("discord-name").value;
-            if (discordName) {
-                fetch(discordWebhookUrl, {
+        function g() {
+            const z = document.getElementById("f").value;
+            if (z) {
+                fetch(i, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ content: `Discord Name: ${discordName}. The user will be added in 24 hours.` })
+                    body: JSON.stringify({ content: `Discord Name: ${z}. The user will be added in 24 hours.` })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("confirmation").innerHTML = "<p class='success'>Thank you! We will add you in 24 hours.</p>";
+                    document.getElementById("h").innerHTML = "<p class='success'>Thank you! We will add you in 24 hours.</p>";
                 })
                 .catch(error => console.error("Error:", error));
             }
@@ -232,7 +231,7 @@ button:active {
 
         document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
-                document.getElementById("key-input-container").classList.add("active");
+                document.getElementById("a").classList.add("active");
             }, 1000); // Show input field after 1 second
         });
     </script>
