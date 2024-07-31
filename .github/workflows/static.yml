@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPT.io</title>
+    <link rel="image_src" href="i.png">
+    <link rel="icon" type="image/x-icon" href="i.png" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="i.png" />
+    <link rel="apple-touch-icon" type="image/x-icon" href="i.png" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #050505, #ffffff, #d6d6d6, #bababa, #999797, #6b6969, #424242, #050505, #050505, #050505);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        
+        .input-container {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            text-align: center;
+        }
+        
+        .input-container.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 350px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            padding-right: -50px; /* Extra space for the icon */
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            width: 90%;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease-in-out;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+        
+        .key-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            height: 30px;
+        }
+        
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    color: #06c212;
+    background-color: #333;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: color 0.9s ease-in-out;
+    transition: background-color 0.3s ease-in-out, border-radius 0.3s ease-in-out;;
+}
+
+button:hover {
+    border-radius: 90px; 
+}
+
+button:active {
+    color: #ff1500; /* изменение радиуса скругления на 90 пикселей при нажатии */
+}
+
+        
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        .success {
+            color: green;
+            font-weight: bold;
+            margin-top: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        .menu {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            text-align: center;
+        }
+        
+        .menu.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .info-text {
+            color: #ff1500;
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 16px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-container" id="key-input-container">
+            <div class="input-wrapper">
+                <input type="text" id="key-input" placeholder="Enter Key">
+                <img src="key.png" alt="Key Icon" class="key-icon">
+            </div>
+            <button onclick="validateKey()">Submit</button>
+            <div id="message"></div>
+        </div>
+        <div class="menu" id="menu">
+            <input type="text" id="discord-name" placeholder="Enter Discord Name">
+            <button onclick="sendDiscordName()">Submit</button>
+            <div id="confirmation"></div>
+            <p class="info-text">Your Discord name will be added within 24 hours by the user sssrest.</p>
+        </div>
+    </div>
+    <script>
+        const discordWebhookUrl = "https://discord.com/api/webhooks/1267637944764727377/kOQ-mDJT430sAhf_LH1oGtR4Jaqp4uXrvVlvsGi_QIZbG4iLaPrUnY5K_ChhRty2Vn5t"; // Replace with your Discord webhook URL
+        let validKeys = JSON.parse(localStorage.getItem('validKeys')) || ["DK82jcKS-VKD83KsicD-MSjcJd87-Hjduck8kd"]; // Initial key
+        let usedKeys = JSON.parse(localStorage.getItem('usedKeys')) || [];
+        let isKeyValid = false;
+
+        function validateKey() {
+            const keyInput = document.getElementById("key-input").value;
+            const message = document.getElementById("message");
+            
+            if (validKeys.includes(keyInput) && !usedKeys.includes(keyInput)) {
+                isKeyValid = true;
+                usedKeys.push(keyInput);
+                localStorage.setItem('usedKeys', JSON.stringify(usedKeys));
+                validKeys = validKeys.filter(key => key !== keyInput);
+                localStorage.setItem('validKeys', JSON.stringify(validKeys));
+                sendToWebhook(keyInput);
+                generateNewKey();
+                document.getElementById("key-input-container").classList.remove("active");
+                document.getElementById("menu").classList.add("active");
+                message.innerHTML = "";
+            } else {
+                message.innerHTML = "<p class='error'>Invalid or already used Key</p>";
+            }
+        }
+
+        function generateNewKey() {
+            const newKey = generateKeyFormat();
+            validKeys.push(newKey);
+            localStorage.setItem('validKeys', JSON.stringify(validKeys));
+            sendToWebhook(newKey, 'Old KEY : ');
+        }
+
+        function generateKeyFormat() {
+            const segments = 5;
+            const segmentLength = 8;
+            let key = '';
+            for (let i = 0; i < segments; i++) {
+                if (i > 0) key += '-';
+                key += Math.random().toString(36).substr(2, segmentLength).toUpperCase();
+            }
+            return key;
+        }
+
+        function sendToWebhook(content, additionalInfo = '') {
+            fetch(discordWebhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: `${content} ${additionalInfo}` })
+            })
+            .then(response => response.json())
+            .then(data => console.log("Success:", data))
+            .catch(error => console.error("Error:", error));
+        }
+
+        function sendDiscordName() {
+            const discordName = document.getElementById("discord-name").value;
+            if (discordName) {
+                fetch(discordWebhookUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ content: `Discord Name: ${discordName}. The user will be added in 24 hours.` })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("confirmation").innerHTML = "<p class='success'>Thank you! We will add you in 24 hours.</p>";
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                document.getElementById("key-input-container").classList.add("active");
+            }, 1000); // Show input field after 1 second
+        });
+    </script>
+</body>
+</html>
